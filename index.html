@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>不急 AI — 慢慢来，比较快</title>
+<style>
+:root {
+  --cream: #FEFAF6; --warm-peach: #F5E6D8; --soft-green: #8EC5B4; --deep-green: #5A9E8B;
+  --tech-purple: #7C5CFC; --tech-blue: #5B8DEF; --tech-indigo: #6366F1; --warm-amber: #F0A050;
+  --text-dark: #2D2B32; --text-mid: #5C5A66; --text-light: #8B8896; --white: #FFFFFF;
+  --card-glass: rgba(255,255,255,0.65); --card-border: rgba(255,255,255,0.9);
+  --shadow-sm: 0 2px 12px rgba(44,40,50,0.06); --shadow-md: 0 8px 32px rgba(44,40,50,0.08);
+  --shadow-lg: 0 16px 48px rgba(44,40,50,0.10); --radius-sm: 12px; --radius-md: 18px;
+  --radius-lg: 24px; --radius-xl: 32px;
+  --font-main: 'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans SC',system-ui,-apple-system,sans-serif;
+  --font-mono: 'Cascadia Code','Fira Code','JetBrains Mono','SF Mono','Consolas',monospace;
+  --transition: 0.35s cubic-bezier(0.22,0.61,0.36,1);
+  --bg-gradient: linear-gradient(170deg,#FEFAF6 0%,#F8F4EE 30%,#F2F0F8 60%,#FEFAF6 100%);
+  --nav-glass: rgba(255,255,255,0.72);
+  --accent-warm: #F0A050;
+  --body-before-1: rgba(124,92,252,0.03); --body-before-2: rgba(142,197,180,0.04); --body-before-3: rgba(91,141,239,0.03);
+}
+/* Weather theme overrides */
+body.weather-clear{--bg-gradient:linear-gradient(170deg,#FFF9F0 0%,#FFF3E2 30%,#FFF6EC 60%,#FEFAF6 100%);--nav-glass:rgba(255,248,238,0.76);--accent-warm:#E89840;--body-before-1:rgba(240,160,80,0.05);--body-before-2:rgba(240,180,100,0.05);--body-before-3:rgba(220,140,60,0.03)}
+body.weather-partly{--bg-gradient:linear-gradient(170deg,#FCF9F4 0%,#F6F2EA 30%,#F4F1F2 60%,#FEFAF6 100%);--nav-glass:rgba(252,248,242,0.76);--accent-warm:#D4A860;--body-before-1:rgba(180,160,120,0.04);--body-before-2:rgba(160,180,140,0.04);--body-before-3:rgba(140,150,180,0.03)}
+body.weather-cloudy{--bg-gradient:linear-gradient(170deg,#F5F4F2 0%,#F1F0EE 30%,#F3F2F5 60%,#F8F7F5 100%);--nav-glass:rgba(246,245,243,0.80);--accent-warm:#B8B0A0;--body-before-1:rgba(140,130,140,0.03);--body-before-2:rgba(150,145,140,0.03);--body-before-3:rgba(130,135,150,0.02)}
+body.weather-rain{--bg-gradient:linear-gradient(170deg,#F1F5F7 0%,#EEF3F6 30%,#F0F4F8 60%,#F3F6F9 100%);--nav-glass:rgba(243,246,248,0.78);--accent-warm:#7EB8C9;--body-before-1:rgba(100,160,180,0.04);--body-before-2:rgba(120,170,190,0.04);--body-before-3:rgba(90,140,170,0.03)}
+body.weather-storm{--bg-gradient:linear-gradient(170deg,#F2F0F8 0%,#EEEBF6 30%,#F1EFF8 60%,#F5F3FA 100%);--nav-glass:rgba(244,242,250,0.78);--accent-warm:#8B7EC8;--body-before-1:rgba(120,100,180,0.05);--body-before-2:rgba(140,110,190,0.04);--body-before-3:rgba(100,90,160,0.03)}
+body.weather-snow{--bg-gradient:linear-gradient(170deg,#F9FBFC 0%,#F4F8FB 30%,#F6F9FC 60%,#FAFCFD 100%);--nav-glass:rgba(250,252,253,0.82);--accent-warm:#B0C8E0;--body-before-1:rgba(160,190,220,0.04);--body-before-2:rgba(180,200,225,0.03);--body-before-3:rgba(140,170,200,0.02)}
+body.weather-fog{--bg-gradient:linear-gradient(170deg,#F7F6F4 0%,#F3F2F0 30%,#F5F4F3 60%,#F9F8F6 100%);--nav-glass:rgba(248,247,246,0.82);--accent-warm:#C8C0B8;--body-before-1:rgba(180,170,160,0.03);--body-before-2:rgba(170,165,155,0.03);--body-before-3:rgba(160,155,150,0.02)}
+.weather-badge{display:inline-flex;align-items:center;gap:5px;font-size:0.8rem;color:var(--text-mid);background:rgba(0,0,0,0.03);border-radius:50px;padding:4px 12px;cursor:default;transition:all 0.3s;white-space:nowrap}.weather-badge .w-icon{font-size:0.9rem}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--font-main);background:var(--bg-gradient);background-attachment:fixed;color:var(--text-dark);line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background 1.2s ease}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:radial-gradient(circle at 20% 20%,var(--body-before-1) 0%,transparent 50%),radial-gradient(circle at 80% 60%,var(--body-before-2) 0%,transparent 50%),radial-gradient(circle at 50% 80%,var(--body-before-3) 0%,transparent 50%);pointer-events:none;z-index:0;transition:background-image 1.2s ease}
+.container{max-width:1100px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+.nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;background:var(--nav-glass);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,0.85);border-radius:50px;padding:10px 28px;display:flex;align-items:center;gap:20px;box-shadow:0 4px 24px rgba(44,40,50,0.06);transition:all 0.8s ease}
+.nav-brand{font-size:1.15rem;font-weight:700;color:var(--text-dark);letter-spacing:-0.3px;display:flex;align-items:center;gap:6px;text-decoration:none}
+.nav-brand .dot{width:8px;height:8px;border-radius:50%;background:var(--soft-green);display:inline-block}
+.nav-links{display:flex;gap:20px;list-style:none}
+.nav-links a{text-decoration:none;color:var(--text-mid);font-size:0.92rem;font-weight:500;transition:color 0.2s}
+.nav-links a:hover,.nav-links a.active{color:var(--tech-purple)}
+section{padding:100px 0;position:relative;z-index:1}
+.section-label{display:inline-block;font-size:0.82rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--tech-purple);margin-bottom:10px;background:rgba(124,92,252,0.08);padding:5px 14px;border-radius:50px}
+.section-title{font-size:2.2rem;font-weight:750;color:var(--text-dark);margin-bottom:14px;letter-spacing:-0.5px;line-height:1.3}
+.section-desc{font-size:1.08rem;color:var(--text-mid);max-width:600px;margin-bottom:40px;line-height:1.75}
+.hero{padding:160px 0 120px;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);border:1px solid rgba(142,197,180,0.4);border-radius:50px;padding:8px 22px;font-size:0.9rem;color:var(--deep-green);font-weight:500;margin-bottom:28px;animation:fadeInUp 0.8s ease-out}
+.hero-badge .pulse{width:8px;height:8px;border-radius:50%;background:var(--soft-green);animation:pulse 2s ease-in-out infinite}
+.hero h1{font-size:3.6rem;font-weight:800;letter-spacing:-1.5px;line-height:1.2;margin-bottom:18px;animation:fadeInUp 0.8s ease-out 0.1s both}
+.hero h1 .gradient-text{background:linear-gradient(135deg,var(--tech-purple) 0%,var(--tech-blue) 50%,var(--deep-green) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero .subtitle{font-size:1.25rem;color:var(--text-mid);max-width:520px;margin:0 auto 36px;line-height:1.8;animation:fadeInUp 0.8s ease-out 0.2s both}
+.hero-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;animation:fadeInUp 0.8s ease-out 0.3s both}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:50px;font-size:1rem;font-weight:600;text-decoration:none;cursor:pointer;border:none;transition:all 0.3s cubic-bezier(0.22,0.61,0.36,1);font-family:var(--font-main)}
+.btn-primary{background:var(--tech-purple);color:#fff;box-shadow:0 6px 28px rgba(124,92,252,0.32)}
+.btn-primary:hover{background:#6A4BEB;transform:translateY(-2px);box-shadow:0 10px 36px rgba(124,92,252,0.40)}
+.btn-outline{background:rgba(255,255,255,0.6);color:var(--text-dark);border:1.5px solid rgba(0,0,0,0.1);backdrop-filter:blur(8px)}
+.btn-outline:hover{background:rgba(255,255,255,0.85);border-color:rgba(0,0,0,0.18);transform:translateY(-2px)}
+.btn-sm{padding:10px 22px;font-size:0.88rem}
+.hero-floating-shapes{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.floating-shape{position:absolute;border-radius:50%;opacity:0.12;animation:float 8s ease-in-out infinite}
+.floating-shape:nth-child(1){width:180px;height:180px;background:var(--soft-green);top:15%;left:8%;animation-delay:0s}
+.floating-shape:nth-child(2){width:120px;height:120px;background:var(--tech-purple);top:55%;right:10%;animation-delay:-3s}
+.floating-shape:nth-child(3){width:90px;height:90px;background:var(--tech-blue);bottom:20%;left:12%;animation-delay:-5s}
+.floating-shape:nth-child(4){width:60px;height:60px;background:var(--warm-amber);top:30%;right:20%;animation-delay:-7s}
+.philosophy{padding:50px 0}
+.philosophy-card{background:var(--card-glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:48px 44px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:36px}
+.philosophy-icon{font-size:3.5rem;flex-shrink:0}
+.philosophy-text h3{font-size:1.4rem;font-weight:700;margin-bottom:8px;color:var(--text-dark)}
+.philosophy-text p{color:var(--text-mid);font-size:1rem;line-height:1.75}
+.path-section{padding:20px 0 80px}
+.path-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.path-card{background:var(--card-glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid transparent;border-radius:var(--radius-xl);padding:32px 28px;text-align:center;cursor:pointer;transition:all 0.35s cubic-bezier(0.22,0.61,0.36,1);box-shadow:var(--shadow-sm);position:relative;overflow:hidden;text-decoration:none;display:block;color:inherit}
+.path-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.path-card.path-beginner:hover{border-color:var(--soft-green)}
+.path-card.path-intermediate:hover{border-color:var(--tech-blue)}
+.path-card.path-advanced:hover{border-color:var(--tech-purple)}
+.path-card .path-icon{font-size:2.8rem;display:block;margin-bottom:14px}
+.path-card .path-level{display:inline-block;font-size:0.72rem;font-weight:700;letter-spacing:1.5px;padding:4px 12px;border-radius:50px;margin-bottom:12px}
+.path-beginner .path-level{background:rgba(142,197,180,0.15);color:var(--deep-green)}
+.path-intermediate .path-level{background:rgba(91,141,239,0.12);color:var(--tech-blue)}
+.path-advanced .path-level{background:rgba(124,92,252,0.12);color:var(--tech-purple)}
+.path-card h3{font-size:1.15rem;font-weight:700;margin-bottom:6px;color:var(--text-dark)}
+.path-card p{font-size:0.88rem;color:var(--text-mid);line-height:1.6;margin-bottom:16px}
+.path-card .path-jump{font-size:0.82rem;color:var(--tech-purple);font-weight:600}
+.news-section{padding:70px 0}
+.news-header-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:16px}
+.news-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.news-updated{font-size:0.82rem;color:var(--text-light);display:flex;align-items:center;gap:6px}
+.news-updated .live-dot{width:7px;height:7px;border-radius:50%;background:var(--soft-green);animation:pulse 2s ease-in-out infinite}
+.news-updated.offline .live-dot{background:var(--text-light);animation:none}
+.news-source-badge{font-size:0.72rem;padding:3px 10px;border-radius:50px;background:rgba(142,197,180,0.12);color:var(--deep-green);font-weight:600}
+.news-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px}
+.news-tab{padding:9px 18px;border-radius:50px;font-size:0.85rem;font-weight:550;border:1px solid rgba(0,0,0,0.08);background:rgba(255,255,255,0.45);cursor:pointer;transition:all 0.25s;font-family:var(--font-main);color:var(--text-mid);backdrop-filter:blur(6px)}
+.news-tab:hover{border-color:var(--tech-purple);color:var(--tech-purple)}
+.news-tab.active{background:var(--tech-purple);color:#fff;border-color:var(--tech-purple)}
+.news-tab .tab-count{font-size:0.72rem;opacity:0.7;margin-left:2px}
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.news-card{background:var(--card-glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:24px 22px;box-shadow:var(--shadow-sm);transition:all 0.3s ease;display:flex;flex-direction:column;gap:12px;position:relative}
+.news-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:rgba(124,92,252,0.2)}
+.news-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.news-card-source{display:inline-flex;align-items:center;gap:5px;font-size:0.73rem;font-weight:650;color:var(--text-light);letter-spacing:0.3px}
+.news-card-source .src-flag{font-size:0.9rem}
+.news-card-date{font-size:0.73rem;color:var(--text-light);white-space:nowrap}
+.news-card h3{font-size:1rem;font-weight:700;line-height:1.45;color:var(--text-dark);flex:1}
+.news-card p{font-size:0.87rem;color:var(--text-mid);line-height:1.6;flex:1}
+.news-card-tags{display:flex;flex-wrap:wrap;gap:6px}
+.news-tag{font-size:0.7rem;padding:4px 10px;border-radius:50px;font-weight:600;cursor:pointer;transition:all 0.2s;border:none;font-family:var(--font-main)}
+.news-tag.audience{background:rgba(124,92,252,0.08);color:var(--tech-purple)}
+.news-tag.audience:hover{background:rgba(124,92,252,0.18)}
+.news-tag.scenario{background:rgba(142,197,180,0.1);color:var(--deep-green)}
+.news-tag.scenario:hover{background:rgba(142,197,180,0.22)}
+.news-card-actions{display:flex;gap:8px;margin-top:auto}
+.news-card-actions .btn{font-size:0.8rem;padding:8px 16px}
+.news-loading{text-align:center;padding:48px;color:var(--text-light)}
+.news-loading .spinner{width:32px;height:32px;border:3px solid rgba(0,0,0,0.06);border-top-color:var(--tech-purple);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.news-empty{text-align:center;padding:48px;color:var(--text-light);font-size:0.95rem}
+.footer{text-align:center;padding:48px 0;border-top:1px solid rgba(0,0,0,0.05)}
+.footer p{font-size:0.88rem;color:var(--text-light)}
+.footer .brand{font-weight:700;color:var(--text-dark)}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.8)}}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0deg)}33%{transform:translateY(-20px) rotate(2deg)}66%{transform:translateY(10px) rotate(-1deg)}}
+.reveal{opacity:0;transform:translateY(30px);transition:all 0.7s cubic-bezier(0.22,0.61,0.36,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+@media(max-width:768px){.nav{padding:8px 18px;gap:14px;border-radius:40px}.nav-links{gap:10px}.nav-links a{font-size:0.8rem}.hero{padding:130px 0 80px}.hero h1{font-size:2.2rem}.hero .subtitle{font-size:1rem}section{padding:60px 0}.section-title{font-size:1.6rem}.philosophy-card{flex-direction:column;text-align:center;padding:32px 24px}.news-grid{grid-template-columns:1fr}.news-header-row{flex-direction:column;align-items:flex-start}.path-grid{grid-template-columns:1fr}}
+@media(max-width:480px){.container{padding:0 16px}.hero h1{font-size:1.8rem}.btn{padding:12px 24px;font-size:0.9rem}}
+</style>
+</head>
+<body>
+<div class="hero-floating-shapes">
+  <div class="floating-shape"></div><div class="floating-shape"></div>
+  <div class="floating-shape"></div><div class="floating-shape"></div>
+</div>
+
+<nav class="nav">
+  <a href="index.html" class="nav-brand"><span class="dot"></span>不急</a>
+  <ul class="nav-links">
+    <li><a href="beginner.html">🌱 入门</a></li>
+    <li><a href="intermediate.html">🌿 进阶</a></li>
+    <li><a href="advanced.html">🌳 探索</a></li>
+    <li><a href="#news">📡 资讯</a></li>
+  </ul>
+  <span class="weather-badge" id="weatherBadge" title="基于你的位置"><span class="w-icon">🌤️</span> <span id="weatherLabel">检测中...</span></span>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge"><span class="pulse"></span> 一款不贩卖焦虑的AI伙伴</div>
+    <h1>AI 可以<br><span class="gradient-text">慢慢来</span></h1>
+    <p class="subtitle">你不用急着成为AI专家。<br>这里没有「不用就落后」的恐吓，只有一步步的陪伴。</p>
+  </div>
+</section>
+
+<section class="path-section">
+  <div class="container">
+    <span class="section-label">选择你的起点</span>
+    <h2 class="section-title">你在哪个位置？</h2>
+    <p class="section-desc">每个人和AI的关系不同。选一条适合自己的路，三个独立页面，不用来回翻。</p>
+    <div class="path-grid reveal">
+      <a href="beginner.html" class="path-card path-beginner">
+        <span class="path-icon">🌱</span>
+        <span class="path-level">第一站</span>
+        <h3>我刚接触AI</h3>
+        <p>还没用过AI或只用过聊天。从心态自测开始，有预设场景一步步带着走。不急，慢慢来。</p>
+        <span class="path-jump">→ 进入入门页面</span>
+      </a>
+      <a href="intermediate.html" class="path-card path-intermediate">
+        <span class="path-icon">🌿</span>
+        <span class="path-level">第二站</span>
+        <h3>我用过，想进阶</h3>
+        <p>ChatGPT/Claude已经很熟了。探索行业专属场景，理解核心概念，学几个高级技巧。</p>
+        <span class="path-jump">→ 进入进阶页面</span>
+      </a>
+      <a href="advanced.html" class="path-card path-advanced">
+        <span class="path-icon">🌳</span>
+        <span class="path-level">第三站</span>
+        <h3>我想探索边界</h3>
+        <p>已经在用Agent。学高级技巧，用场景工坊定制你的专属方案，把AI用出别人想不到的花样。</p>
+        <span class="path-jump">→ 进入探索页面</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="philosophy" style="padding-top:0;">
+  <div class="container">
+    <div class="philosophy-card reveal">
+      <span class="philosophy-icon">🤝</span>
+      <div class="philosophy-text">
+        <h3>我们的立场</h3>
+        <p>AI是一个工具，不用它不代表你落后，用它不代表你作弊。<strong>选择权在你手里。</strong>当我们<em>自己</em>决定想试试的时候，这里有一条不那么吓人的路。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="news" class="news-section">
+  <div class="container">
+    <span class="section-label">AI资讯洞察 · 自动聚合</span>
+    <div class="news-header-row">
+      <div>
+        <h2 class="section-title" style="margin-bottom:4px;">AI 脉搏</h2>
+        <p class="section-desc" style="margin-bottom:0;">自动搜索国内外可靠信息源，每条资讯都精准对接使用场景。去进阶/探索页面打开对应教程。</p>
+      </div>
+      <div class="news-meta">
+        <span class="news-source-badge" id="newsSourceCount">📡 4 个信息源</span>
+        <span class="news-updated" id="newsUpdated"><span class="live-dot"></span> <span id="newsUpdatedText">加载中…</span></span>
+        <button class="btn btn-outline btn-sm" onclick="refreshNews()" id="newsRefreshBtn">🔄 刷新</button>
+      </div>
+    </div>
+    <div class="news-tabs" id="newsTabs">
+      <button class="news-tab active" onclick="filterNews('all',this)">全部</button>
+      <button class="news-tab" onclick="filterNews('student',this)">🎓 学生学习</button>
+      <button class="news-tab" onclick="filterNews('workplace',this)">💼 职场应用</button>
+      <button class="news-tab" onclick="filterNews('tool',this)">🛠️ 工具与技巧</button>
+      <button class="news-tab" onclick="filterNews('think',this)">🧠 深度思考</button>
+    </div>
+    <div class="news-grid" id="newsGrid">
+      <div class="news-loading"><div class="spinner"></div><p>正在从国内外信息源获取最新AI资讯…</p></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p><span class="brand">不急</span> · 一款不贩卖焦虑的AI伙伴</p>
+    <p style="margin-top:6px;">Made with thoughtfulness · Demo v0.5 · <a href="beginner.html">入门</a> · <a href="intermediate.html">进阶</a> · <a href="advanced.html">探索</a></p>
+  </div>
+</footer>
+
+<script>
+// ===== NEWS SYSTEM =====
+const curatedNews=[{title:'Claude Code 现已支持 Windows 原生终端',summary:'Anthropic 发布 Claude Code for Windows 原生支持，不再需要 WSL。一行命令即可安装，对国内 Windows 用户极为友好。',source:'Anthropic Blog',sourceFlag:'🇺🇸',date:'2026-06-08',category:'tool',audience:['🎓 学生','💼 职场'],linkedScenarios:['organize','meeting'],url:'#'},{title:'中山大学启动「AI+高等教育」教学改革试点',summary:'中大在2026年春季学期试点将AI工具融入通识课教学。学生反馈：有指导的AI使用比「自己乱问」效率高3倍。',source:'中山大学教务处',sourceFlag:'🇨🇳',date:'2026-06-05',category:'student',audience:['🎓 学生'],linkedScenarios:['notes','literature'],url:'#'},{title:'深度解析：Skills 到底是什么？Claude Code 内置技能系统详解',summary:'Skills 是 Claude Code最被低估的功能。理解Skills = 理解如何让AI切换思维方式，这是从「会用」到「用得好」的关键。',source:'技术圆桌',sourceFlag:'🇨🇳',date:'2026-06-03',category:'think',audience:['🎓 学生','💼 职场','🌐 通用'],linkedScenarios:['organize'],url:'intermediate.html'},{title:'调查：76%的职场新人表示「被迫学AI」是最大压力来源',summary:'脉脉联合36氪发布白皮书：76%的职场新人有AI焦虑，但63%的人从未接受过系统性AI使用培训。',source:'36氪',sourceFlag:'🇨🇳',date:'2026-06-02',category:'workplace',audience:['💼 职场'],linkedScenarios:['meeting','datareport'],url:'#'},{title:'AI Agent 正在重新定义「效率工具」——从 Copilot 到 Autopilot',summary:'2026年被定义为「Agent元年」。区别于Copilot（你操作AI辅助），Agent让不懂编程的人也能自动化工作流。',source:'The Verge',sourceFlag:'🇺🇸',date:'2026-06-01',category:'think',audience:['🌐 通用'],linkedScenarios:['organize','datareport'],url:'advanced.html'},{title:'商赛评委：AI不是让你替代思考，而是把思考放在更高维度',summary:'真正优秀的AI+商业方案，不是「用AI做了一个PPT」，而是用AI分析数据发现了人工难以发现的用户洞察。',source:'创业邦',sourceFlag:'🇨🇳',date:'2026-05-30',category:'student',audience:['🎓 学生'],linkedScenarios:['datareport','examplan'],url:'#'},{title:'新手指南：第一次用Claude Code就上手——5个最实用的入门场景',summary:'包括整理资料、文献摘要、代码调试、会议纪要、数据分析。每个场景附可复制的Prompt模板。',source:'少数派',sourceFlag:'🇨🇳',date:'2026-05-28',category:'tool',audience:['🎓 学生','💼 职场','🌐 通用'],linkedScenarios:['notes','organize','meeting','datareport'],url:'beginner.html'},{title:'Prompt Engineering 已死？不，它进化成了「对话设计」',summary:'传统Prompt模板重要性在下降，但「对话设计」——如何引导AI思考、如何迭代——变得更加关键。',source:'机器之心',sourceFlag:'🇨🇳',date:'2026-05-22',category:'think',audience:['🎓 学生','💼 职场','🌐 通用'],linkedScenarios:['notes','literature','meeting'],url:'intermediate.html'},{title:'Excel + AI：让Claude帮你自动生成数据分析报告',summary:'手把手教程——CSV数据喂给Claude Code，自动生成趋势分析、异常检测、可视化建议的数据报告初稿。',source:'知乎专栏',sourceFlag:'🇨🇳',date:'2026-05-20',category:'workplace',audience:['💼 职场'],linkedScenarios:['datareport'],url:'intermediate.html'},{title:'中国AI教育观察：大学应该教学生「用AI」还是「理解AI」？',summary:'多所高校教育学者讨论AI素养教育核心——不是教怎么用工具，而是帮学生建立AI的元认知。',source:'光明日报·教育版',sourceFlag:'🇨🇳',date:'2026-05-18',category:'think',audience:['🎓 学生'],linkedScenarios:[],url:'#'},{title:'从「AI焦虑」到「AI自在」：一位中大学生的自述',summary:'一名中大学生的真实经历——从被商赛逼着学AI很烦躁，到用Claude Code整理了4个学期的笔记后感到平静。',source:'中大青年',sourceFlag:'🇨🇳',date:'2026-05-15',category:'student',audience:['🎓 学生'],linkedScenarios:['notes','examplan'],url:'#'}];
+const newsCategories={all:{label:'全部',filter:()=>true},student:{label:'🎓 学生学习',filter:i=>i.category==='student'||i.audience.includes('🎓 学生')},workplace:{label:'💼 职场应用',filter:i=>i.category==='workplace'||i.audience.includes('💼 职场')},tool:{label:'🛠️ 工具与技巧',filter:i=>i.category==='tool'},think:{label:'🧠 深度思考',filter:i=>i.category==='think'}};
+const scenarioLabels={notes:'📝 课堂笔记整理',literature:'📚 文献阅读',organize:'📁 文件整理',examplan:'📅 复习计划',meeting:'💼 会议纪要',datareport:'📊 数据报告',install:'🪟 安装配置'};
+const RSS_SOURCES=[{url:'https://api.rss2json.com/v1/api.json?rss_url=https://techcrunch.com/category/artificial-intelligence/feed/',name:'TechCrunch AI',flag:'🇺🇸',category:'tool'},{url:'https://api.rss2json.com/v1/api.json?rss_url=https://www.theverge.com/ai-artificial-intelligence/rss/index.xml',name:'The Verge AI',flag:'🇺🇸',category:'think'},{url:'https://api.rss2json.com/v1/api.json?rss_url=https://feeds.feedburner.com/36kr',name:'36氪',flag:'🇨🇳',category:'workplace'},{url:'https://api.rss2json.com/v1/api.json?rss_url=https://www.jiqizhixin.com/rss',name:'机器之心',flag:'🇨🇳',category:'think'}];
+let allNewsItems=[...curatedNews],currentNewsFilter='all',newsFetchInProgress=false;
+function autoMatchScenarios(title,summary){const text=(title+' '+summary).toLowerCase();const matches=[];const rules=[{key:'notes',keywords:['笔记','课堂','整理','大纲','课程','note','study','lecture']},{key:'literature',keywords:['文献','论文','阅读','读不动','摘要','paper','research','read']},{key:'organize',keywords:['文件夹','整理','分类','资料','文件','organize','file','sort']},{key:'examplan',keywords:['考试','复习','计划','备考','日程','exam','plan','schedule']},{key:'meeting',keywords:['会议','纪要','职场','工作','邮件','meeting','workplace','office']},{key:'datareport',keywords:['数据','报告','分析','报表','csv','excel','data','report','analytics']}];rules.forEach(r=>{if(r.keywords.some(kw=>text.includes(kw)))matches.push(r.key)});return matches.length>0?matches:['notes']}
+function renderNewsCards(items){const grid=document.getElementById('newsGrid');if(!items||items.length===0){grid.innerHTML='<div class="news-empty">😴 暂无匹配资讯。试试切换分类或点击刷新。</div>';return}grid.innerHTML=items.map(item=>{const audienceTags=(item.audience||[]).map(a=>'<span class="news-tag audience">'+a+'</span>').join('');const sm=item.linkedScenarios&&item.linkedScenarios.length>0?item.linkedScenarios:autoMatchScenarios(item.title,item.summary||'');const scenarioTags=sm.slice(0,3).map(s=>'<span class="news-tag scenario" onclick="event.stopPropagation()">'+((scenarioLabels[s]||'📌 相关场景')+'</span>')).join('');return'<div class="news-card reveal"><div class="news-card-header"><span class="news-card-source"><span class="src-flag">'+(item.sourceFlag||'📡')+'</span> '+item.source+'</span><span class="news-card-date">'+item.date+'</span></div><h3>'+item.title+'</h3><p>'+item.summary+'</p><div class="news-card-tags">'+audienceTags+scenarioTags+'</div><div class="news-card-actions">'+(item.url&&item.url.includes('.html')?'<a href="'+item.url+'" class="btn btn-outline" style="font-size:0.78rem;padding:7px 16px;">🔗 去对应页面</a>':(item.url&&item.url!=='#'?'<a href="'+item.url+'" target="_blank" rel="noopener" class="btn btn-outline" style="font-size:0.78rem;padding:7px 16px;">🔗 阅读原文</a>':''))+'</div></div>'}).join('');setTimeout(handleReveal,100)}
+function filterNews(category,tabEl){currentNewsFilter=category;document.querySelectorAll('.news-tab').forEach(t=>t.classList.remove('active'));if(tabEl)tabEl.classList.add('active');const filtered=category==='all'?allNewsItems:allNewsItems.filter(newsCategories[category].filter);renderNewsCards(filtered);updateTabCounts()}
+function updateTabCounts(){document.querySelectorAll('.news-tab').forEach(tab=>{const cat=tab.textContent.includes('全部')?'all':tab.textContent.includes('学生')?'student':tab.textContent.includes('职场')?'workplace':tab.textContent.includes('工具')?'tool':tab.textContent.includes('深度')?'think':'all';const count=cat==='all'?allNewsItems.length:allNewsItems.filter(newsCategories[cat].filter).length;const ec=tab.querySelector('.tab-count');if(ec)ec.remove();if(count>0)tab.insertAdjacentHTML('beforeend','<span class="tab-count">('+count+')</span>')})}
+async function fetchFromRSS(source){try{const c=new AbortController();const t=setTimeout(()=>c.abort(),8000);const r=await fetch(source.url,{signal:c.signal});clearTimeout(t);if(!r.ok)return[];const d=await r.json();if(d.status!=='ok'||!d.items)return[];return d.items.slice(0,6).map(i=>({title:i.title,summary:(i.description||'').replace(/<[^>]*>/g,'').slice(0,150)+'…',source:source.name,sourceFlag:source.flag,date:new Date(i.pubDate).toISOString().slice(0,10),category:source.category,audience:source.category==='workplace'?['💼 职场']:(source.category==='tool'?['🌐 通用']:['🎓 学生','🌐 通用']),linkedScenarios:autoMatchScenarios(i.title,i.description||''),url:i.link}))}catch(e){return[]}}
+async function refreshNews(){if(newsFetchInProgress)return;newsFetchInProgress=true;const btn=document.getElementById('newsRefreshBtn');const grid=document.getElementById('newsGrid');const ue=document.getElementById('newsUpdated');const ut=document.getElementById('newsUpdatedText');btn.textContent='⏳ 获取中…';btn.disabled=true;ue.classList.remove('offline');ut.textContent='正在搜索…';grid.innerHTML='<div class="news-loading"><div class="spinner"></div><p>正在从 '+RSS_SOURCES.length+' 个信息源获取最新AI资讯…</p></div>';const results=await Promise.all(RSS_SOURCES.map(s=>fetchFromRSS(s)));const fetchedItems=results.flat();const merged=[...fetchedItems];const existingTitles=new Set(fetchedItems.map(f=>f.title.slice(0,30).toLowerCase()));curatedNews.forEach(c=>{if(!existingTitles.has(c.title.slice(0,30).toLowerCase()))merged.push(c)});allNewsItems=merged;const now=new Date();const timeStr=now.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});ut.textContent=fetchedItems.length>0?'刚刚更新 · '+timeStr+' (获取'+fetchedItems.length+'条新资讯)':'已加载 · '+timeStr+' (使用精选资讯库)';if(fetchedItems.length===0)ue.classList.add('offline');else ue.classList.remove('offline');document.getElementById('newsSourceCount').textContent='📡 '+RSS_SOURCES.length+' 个信息源';filterNews(currentNewsFilter,document.querySelector('.news-tab.active'));updateTabCounts();btn.textContent='🔄 刷新';btn.disabled=false;newsFetchInProgress=false}
+// ===== WEATHER SYSTEM =====
+const weatherMap={0:{cls:'clear',icon:'☀️',label:'晴'},1:{cls:'clear',icon:'🌤️',label:'晴'},2:{cls:'partly',icon:'⛅',label:'多云'},3:{cls:'cloudy',icon:'☁️',label:'阴'},45:{cls:'fog',icon:'🌫️',label:'雾'},48:{cls:'fog',icon:'🌫️',label:'雾凇'},51:{cls:'rain',icon:'🌦️',label:'小雨'},53:{cls:'rain',icon:'🌧️',label:'中雨'},55:{cls:'rain',icon:'🌧️',label:'大雨'},61:{cls:'rain',icon:'🌧️',label:'阵雨'},63:{cls:'rain',icon:'🌧️',label:'中阵雨'},65:{cls:'rain',icon:'⛈️',label:'暴雨'},71:{cls:'snow',icon:'❄️',label:'小雪'},73:{cls:'snow',icon:'❄️',label:'中雪'},75:{cls:'snow',icon:'❄️',label:'大雪'},80:{cls:'rain',icon:'🌦️',label:'骤雨'},82:{cls:'rain',icon:'⛈️',label:'暴雨'},95:{cls:'storm',icon:'⛈️',label:'雷暴'},96:{cls:'storm',icon:'⛈️',label:'雷暴+冰雹'},99:{cls:'storm',icon:'⛈️',label:'强雷暴'}};
+function applyWeather(weatherCode,temp,city){
+  const w=weatherMap[weatherCode]||weatherMap[0];
+  document.body.className=document.body.className.replace(/weather-\w+/g,'');
+  document.body.classList.add('weather-'+w.cls);
+  const badge=document.getElementById('weatherBadge');
+  const label=document.getElementById('weatherLabel');
+  if(badge&&label){badge.title=(city||'你的位置')+' · '+w.label+' · '+(temp!=null?temp+'°C':'');label.textContent=(city?city.substring(0,6):'')+' '+w.label+(temp!=null?' '+temp+'°C':'')}
+}
+async function detectWeather(){
+  try{
+    let lat,lon,city='';
+    // Try browser geolocation
+    try{
+      const pos=await new Promise((resolve,reject)=>{navigator.geolocation.getCurrentPosition(resolve,reject,{timeout:5000,maximumAge:600000})});
+      lat=pos.coords.latitude;lon=pos.coords.longitude;
+    }catch(e){
+      // Fallback: IP-based
+      try{const r=await fetch('https://ipapi.co/json/');const d=await r.json();if(d.latitude){lat=d.latitude;lon=d.longitude;city=d.city||''}}catch(e2){}
+    }
+    if(lat==null){lat=23.1291;lon=113.2644;city='广州'}// Default to Guangzhou
+    // Reverse geocode if no city
+    if(!city){try{const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current_weather=true&timezone=Asia/Shanghai');const d=await r.json();if(d.current_weather){applyWeather(d.current_weather.weathercode,d.current_weather.temperature,city||'');return}}catch(e){}}
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current_weather=true&timezone=auto');
+    const d=await r.json();
+    if(d.current_weather){applyWeather(d.current_weather.weathercode,d.current_weather.temperature,city)}
+  }catch(e){applyWeather(0,null,'')}
+}
+detectWeather();
+
+function handleReveal(){document.querySelectorAll('.reveal').forEach(el=>{const rect=el.getBoundingClientRect();if(rect.top<window.innerHeight*0.85)el.classList.add('visible')})}
+window.addEventListener('scroll',handleReveal);
+window.addEventListener('load',()=>{handleReveal();allNewsItems=[...curatedNews];renderNewsCards(allNewsItems);updateTabCounts();document.getElementById('newsUpdatedText').textContent='已加载精选资讯库';setTimeout(()=>refreshNews(),1200)});
+</script>
+</body>
+</html>
