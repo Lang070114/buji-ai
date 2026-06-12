@@ -716,7 +716,7 @@ function applyWeather(weatherCode,temp,city){
   document.body.classList.add('weather-'+w.cls);
   const badge=document.getElementById('weatherBadge');
   const label=document.getElementById('weatherLabel');
-  if(badge&&label){badge.title=(city||'你的位置')+' · '+w.label+' · '+(temp!=null?temp+'°C':'');label.textContent=(city?city.substring(0,6):'')+' '+w.label+(temp!=null?' '+temp+'°C':'')}
+  if(badge&&label){badge.title=w.label+(temp!=null?' · '+temp+'°C':'');label.textContent=w.label+(temp!=null?' '+temp+'°C':'')}
 }
 async function detectWeather(){
   try{
