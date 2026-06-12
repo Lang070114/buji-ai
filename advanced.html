@@ -15,21 +15,6 @@
 .parallax-layer.layer-near{opacity:0.10;transform:translateY(0)}
 .parallax-shape{position:absolute;border-radius:50%;filter:blur(60px)}
 /* Day/Night text adaption */
-body.night-time .section-title,body.night-time h1,body.night-time h2,body.night-time h3,body.night-time h4{color:rgba(255,255,255,0.88)}
-body.night-time .section-desc,body.night-time p{color:rgba(255,255,255,0.65)}
-body.night-time .card-glass,body.night-time [class*="card"]{background:rgba(20,18,30,0.55)!important;border-color:rgba(255,255,255,0.08)!important;color:rgba(255,255,255,0.82)}
-body.night-time .nav{background:rgba(20,18,30,0.68)!important;border-color:rgba(255,255,255,0.1)!important}
-body.night-time .nav-links a{color:rgba(255,255,255,0.65)}
-body.night-time .btn-outline{background:rgba(30,28,40,0.5)!important;color:rgba(255,255,255,0.8)!important;border-color:rgba(255,255,255,0.12)!important}
-body.night-time .footer{border-top-color:rgba(255,255,255,0.06)}
-body.night-time .tutorial-panel{background:rgba(20,18,30,0.92)!important}
-body.night-time .tutorial-guide{color:rgba(255,255,255,0.82)}
-body.night-time .section-label{background:rgba(124,92,252,0.18);color:#A78BFA}
-body.night-time .tutorial-side{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.06)}
-body.night-time .news-card,body.night-time .glossary-card,body.night-time .skill-card,body.night-time .industry-card,body.night-time .belief-card,body.night-time .cc-card,body.night-time .scenario-card,body.night-time .philosophy-card,body.night-time .path-card{background:rgba(20,18,30,0.55)!important;border-color:rgba(255,255,255,0.08)!important}
-body.night-time .news-card h3,body.night-time .glossary-card h3,body.night-time .skill-card h4{color:rgba(255,255,255,0.85)}
-body.night-time .news-card p,body.night-time .glossary-card p,body.night-time .skill-card .skill-twist{color:rgba(255,255,255,0.55)}
-body.night-time .path-jump{color:#A78BFA}
 
 /* ===== v0.7: Clean solid cards (no glassmorphism) ===== */
 .nav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(255,255,255,0.88)!important;border:1px solid rgba(0,0,0,0.06)!important}
@@ -38,11 +23,6 @@ body.night-time .path-jump{color:#A78BFA}
 .btn-outline{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .hero-badge{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .tutorial-overlay{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(30,28,38,0.65)}
-body.night-time .nav{background:rgba(20,18,30,0.82)!important;border-color:rgba(255,255,255,0.06)!important}
-body.night-time .philosophy-card,body.night-time .quiz-wrapper,body.night-time .workshop-wrapper{background:rgba(20,18,30,0.82)!important}
-body.night-time .news-card,body.night-time .scenario-card,body.night-time .cc-card,body.night-time .belief-card,body.night-time .glossary-card,body.night-time .skill-card,body.night-time .industry-card,body.night-time .path-card{background:rgba(20,18,30,0.72)!important}
-body.night-time .btn-outline{background:rgba(30,28,40,0.6)!important}
-body.night-time .tutorial-overlay{background:rgba(10,8,18,0.7)!important}
 
 @media(max-width:768px){.nav{padding:8px 18px;gap:14px;border-radius:40px}.nav-links{gap:10px}.nav-links a{font-size:0.8rem}.hero-compact{padding:110px 0 50px}section{padding:60px 0}.section-title{font-size:1.6rem}.skill-grid{grid-template-columns:1fr}.industry-grid{grid-template-columns:1fr}.workshop-wrapper{padding:28px 22px}}@media(max-width:480px){.container{padding:0 16px}.btn{padding:12px 24px;font-size:0.9rem}}
 </style>
@@ -166,7 +146,8 @@ function drawAurora(timestamp){
   const hour=getHourFraction();
   const palette=getPalette(hour);
   const isNight=hour<6||hour>=20;
-  document.body.classList.toggle('night-time',isNight);
+  // night-time class toggle disabled - nav & cards stay original
+
   // Draw 5 flowing aurora ribbons
   for(let r=0;r<5;r++){
     const baseHue=palette[r%palette.length];
