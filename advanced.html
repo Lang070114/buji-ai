@@ -28,6 +28,93 @@
 /* ===== Day/Night background cycle (background only, no UI changes) ===== */
 body.night-bg{background:linear-gradient(170deg,#1a1830 0%,#1e1c35 30%,#221f3a 60%,#1c1a32 100%)!important}
 body.night-bg::before{background-image:radial-gradient(circle at 20% 20%,rgba(124,92,252,0.06) 0%,transparent 50%),radial-gradient(circle at 80% 60%,rgba(142,197,180,0.04) 0%,transparent 50%),radial-gradient(circle at 50% 80%,rgba(91,141,239,0.04) 0%,transparent 50%)!important}
+
+/* ===== Night background: non-card text adapts to dark bg ===== */
+body.night-bg .hero h1{color:rgba(255,255,255,0.92)}
+body.night-bg .hero h1 .gradient-text{background:linear-gradient(135deg,#A78BFA 0%,#93C5FD 50%,#6EE7B7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+body.night-bg .hero .subtitle{color:rgba(255,255,255,0.65)}
+body.night-bg .section-title{color:rgba(255,255,255,0.9)}
+body.night-bg .section-desc{color:rgba(255,255,255,0.6)}
+body.night-bg .section-label{background:rgba(167,139,250,0.18);color:#C4B5FD}
+body.night-bg .nav-links a{color:rgba(255,255,255,0.62)}
+body.night-bg .nav-links a:hover,body.night-bg .nav-links a.active{color:#C4B5FD}
+body.night-bg .nav-brand{color:rgba(255,255,255,0.85)}
+body.night-bg .philosophy-text h3{color:rgba(255,255,255,0.88)}
+body.night-bg .philosophy-text p{color:rgba(255,255,255,0.6)}
+body.night-bg .path-card h3{color:rgba(255,255,255,0.88)}
+body.night-bg .path-card p{color:rgba(255,255,255,0.55)}
+body.night-bg .path-jump{color:#A78BFA}
+body.night-bg .footer p,body.night-bg .footer .brand{color:rgba(255,255,255,0.45)}
+body.night-bg .footer a{color:rgba(255,255,255,0.6)}
+body.night-bg .cta-section h2{color:rgba(255,255,255,0.9)}
+body.night-bg .cta-section p{color:rgba(255,255,255,0.6)}
+body.night-bg .news-tab{color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.06)}
+body.night-bg .news-tab:hover{color:#C4B5FD;border-color:rgba(167,139,250,0.4)}
+body.night-bg .news-tab.active{background:#7C5CFC;color:#fff;border-color:#7C5CFC}
+body.night-bg .scenario-tab-btn{color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.06)}
+body.night-bg .scenario-tab-btn:hover{color:#C4B5FD;border-color:rgba(167,139,250,0.4)}
+body.night-bg .scenario-tab-btn.active{background:#7C5CFC;color:#fff;border-color:#7C5CFC}
+body.night-bg .workshop-step-title{color:rgba(255,255,255,0.85)}
+body.night-bg .workshop-textarea{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.85);border-color:rgba(255,255,255,0.1)}
+body.night-bg .workshop-textarea::placeholder{color:rgba(255,255,255,0.35)}
+body.night-bg .workshop-ind-chip{color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.06)}
+body.night-bg .workshop-ind-chip:hover{color:#C4B5FD;border-color:rgba(167,139,250,0.4)}
+body.night-bg .workshop-ind-chip.selected{background:#7C5CFC;color:#fff;border-color:#7C5CFC}
+body.night-bg .timeline-item h3{color:rgba(255,255,255,0.88)}
+body.night-bg .timeline-item p{color:rgba(255,255,255,0.6)}
+body.night-bg .cc-header h2{color:rgba(255,255,255,0.88)}
+body.night-bg .cc-header p{color:rgba(255,255,255,0.6)}
+body.night-bg .cc-card h3{color:rgba(255,255,255,0.85)}
+body.night-bg .cc-card p{color:rgba(255,255,255,0.55)}
+body.night-bg .belief-card h4{color:rgba(255,255,255,0.85)}
+body.night-bg .belief-card p{color:rgba(255,255,255,0.55)}
+body.night-bg .glossary-card h3{color:rgba(255,255,255,0.85)}
+body.night-bg .glossary-card .glossary-brief{color:rgba(255,255,255,0.5)}
+body.night-bg .industry-card h4{color:rgba(255,255,255,0.85)}
+body.night-bg .industry-card p{color:rgba(255,255,255,0.55)}
+body.night-bg .skill-card h4{color:rgba(255,255,255,0.85)}
+body.night-bg .skill-card .skill-twist{color:rgba(255,255,255,0.55)}
+body.night-bg .path-badge{background:rgba(167,139,250,0.15);color:#C4B5FD;border-color:rgba(167,139,250,0.25)}
+body.night-bg .hero-badge{background:rgba(167,139,250,0.12);color:#A78BFA;border-color:rgba(167,139,250,0.2)}
+body.night-bg .hero-badge .pulse{background:#A78BFA}
+body.night-bg .quiz-question{color:rgba(255,255,255,0.88)}
+body.night-bg .quiz-counter{color:rgba(255,255,255,0.45)}
+body.night-bg .quiz-option{color:rgba(255,255,255,0.8);background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.1)}
+body.night-bg .quiz-option:hover{border-color:rgba(167,139,250,0.4);background:rgba(167,139,250,0.1)}
+body.night-bg .quiz-option.selected{background:rgba(167,139,250,0.2);border-color:#A78BFA}
+body.night-bg .news-card h3{color:rgba(255,255,255,0.85)}
+body.night-bg .news-card p{color:rgba(255,255,255,0.55)}
+body.night-bg .news-card-source{color:rgba(255,255,255,0.45)}
+body.night-bg .news-card-date{color:rgba(255,255,255,0.4)}
+body.night-bg .news-updated{color:rgba(255,255,255,0.5)}
+body.night-bg .news-source-badge{color:#6EE7B7;background:rgba(110,231,183,0.1)}
+body.night-bg .news-loading p{color:rgba(255,255,255,0.5)}
+body.night-bg .news-empty{color:rgba(255,255,255,0.4)}
+body.night-bg .scenario-card h3{color:rgba(255,255,255,0.85)}
+body.night-bg .scenario-card .scenario-hint{color:rgba(255,255,255,0.45)}
+body.night-bg .scenario-tag{background:rgba(167,139,250,0.15);color:#C4B5FD}
+body.night-bg .glossary-detail .glossary-what{color:rgba(255,255,255,0.8)}
+body.night-bg .glossary-detail .glossary-when{color:#6EE7B7;background:rgba(110,231,183,0.1)}
+body.night-bg .skill-detail .skill-how{color:rgba(255,255,255,0.7)}
+body.night-bg .skill-detail .skill-use{color:#6EE7B7;background:rgba(110,231,183,0.1)}
+body.night-bg .workshop-result h4{color:rgba(255,255,255,0.88)}
+body.night-bg .workshop-plan-step .step-head{color:rgba(255,255,255,0.85)}
+body.night-bg .workshop-plan-step .step-body{color:rgba(255,255,255,0.6)}
+body.night-bg .workshop-warn{color:rgba(255,255,255,0.7);background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.2)}
+body.night-bg .concept-callout h4{color:rgba(255,255,255,0.85)}
+body.night-bg .concept-callout p{color:rgba(255,255,255,0.65)}
+body.night-bg .concept-callout .concept-why{color:#6EE7B7;background:rgba(110,231,183,0.08)}
+body.night-bg .tutorial-step-title{color:rgba(255,255,255,0.9)}
+body.night-bg .tutorial-step-desc{color:rgba(255,255,255,0.65)}
+body.night-bg .tutorial-step-indicator{color:#C4B5FD}
+body.night-bg .tutorial-panel{background:rgba(22,20,36,0.95)}
+body.night-bg .tutorial-header h2{color:rgba(255,255,255,0.88)}
+body.night-bg .tutorial-side h4{color:rgba(255,255,255,0.5)}
+body.night-bg .tutorial-side .checklist li{color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.04)}
+body.night-bg .tutorial-side .checklist li.current{color:#C4B5FD;background:rgba(167,139,250,0.1)}
+body.night-bg .btn-outline{color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.06)}
+body.night-bg .btn-outline:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.95)}
+body.night-bg .weather-badge{color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.06)}
 @media(max-width:768px){.nav{padding:8px 18px;gap:14px;border-radius:40px}.nav-links{gap:10px}.nav-links a{font-size:0.8rem}.hero-compact{padding:110px 0 50px}section{padding:60px 0}.section-title{font-size:1.6rem}.skill-grid{grid-template-columns:1fr}.industry-grid{grid-template-columns:1fr}.workshop-wrapper{padding:28px 22px}}@media(max-width:480px){.container{padding:0 16px}.btn{padding:12px 24px;font-size:0.9rem}}
 </style>
 </head>
