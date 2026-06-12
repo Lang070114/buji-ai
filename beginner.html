@@ -611,7 +611,41 @@ window.addEventListener('load',buildParallaxShapes);
 // ===== WEATHER SYSTEM =====
 const weatherMap={0:{cls:"clear",icon:"☀️",label:"晴"},1:{cls:"clear",icon:"🌤️",label:"晴"},2:{cls:"partly",icon:"⛅",label:"多云"},3:{cls:"cloudy",icon:"☁️",label:"阴"},45:{cls:"fog",icon:"🌫️",label:"雾"},48:{cls:"fog",icon:"🌫️",label:"雾凇"},51:{cls:"rain",icon:"🌦️",label:"小雨"},53:{cls:"rain",icon:"🌧️",label:"中雨"},55:{cls:"rain",icon:"🌧️",label:"大雨"},61:{cls:"rain",icon:"🌧️",label:"阵雨"},63:{cls:"rain",icon:"🌧️",label:"中阵雨"},65:{cls:"rain",icon:"⛈️",label:"暴雨"},71:{cls:"snow",icon:"❄️",label:"小雪"},73:{cls:"snow",icon:"❄️",label:"中雪"},75:{cls:"snow",icon:"❄️",label:"大雪"},80:{cls:"rain",icon:"🌦️",label:"骤雨"},82:{cls:"rain",icon:"⛈️",label:"暴雨"},95:{cls:"storm",icon:"⛈️",label:"雷暴"},96:{cls:"storm",icon:"⛈️",label:"雷暴+冰雹"},99:{cls:"storm",icon:"⛈️",label:"强雷暴"}};
 function applyWeather(weatherCode,temp,city){const w=weatherMap[weatherCode]||weatherMap[0];document.body.className=document.body.className.replace(/weather-\w+/g,"");document.body.classList.add("weather-"+w.cls);const badge=document.getElementById("weatherBadge");const label=document.getElementById("weatherLabel");if(badge&&label){badge.title=(city||"你的位置")+" · "+w.label+" · "+(temp!=null?temp+"°C":"");label.textContent=(city?city.substring(0,6):"")+" "+w.label+(temp!=null?" "+temp+"°C":"")}}
-async function detectWeather(){try{let lat,lon,city="";try{const pos=await new Promise((resolve,reject)=>{navigator.geolocation.getCurrentPosition(resolve,reject,{timeout:5000,maximumAge:600000})});lat=pos.coords.latitude;lon=pos.coords.longitude}catch(e){try{const r=await fetch("https://ipapi.co/json/");const d=await r.json();if(d.latitude){lat=d.latitude;lon=d.longitude;city=d.city||""}}catch(e2){}}if(lat==null){lat=23.1291;lon=113.2644;city="广州"}const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current_weather=true&timezone=auto");const d=await r.json();if(d.current_weather){applyWeather(d.current_weather.weathercode,d.current_weather.temperature,city)}}catch(e){applyWeather(0,null,"")}}
+async function detectWeather(){
+  try{
+    let lat,lon,city='';
+    // 1st: Browser GPS with high accuracy + fresh position (2min cache max)
+    try{
+      const pos=await new Promise((resolve,reject)=>{
+        navigator.geolocation.getCurrentPosition(resolve,reject,{
+          enableHighAccuracy:true,
+          timeout:8000,
+          maximumAge:120000
+        });
+      });
+      lat=pos.coords.latitude;lon=pos.coords.longitude;
+    }catch(e){
+      // 2nd: IP-based geolocation
+      try{const r=await fetch('https://ipapi.co/json/');const d=await r.json();if(d.latitude){lat=d.latitude;lon=d.longitude;city=d.city||''}}catch(e2){}
+    }
+    // 3rd: Hardcoded fallback
+    if(lat==null){lat=23.1291;lon=113.2644;city='广州'}
+    // Reverse geocode via Nominatim (free, no API key, proper city name)
+    if(!city){
+      try{
+        const rg=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lon+'&zoom=10&accept-language=zh');
+        const rd=await rg.json();
+        if(rd&&rd.address){
+          city=rd.address.city||rd.address.town||rd.address.county||rd.address.state||'';
+        }
+      }catch(e){}
+    }
+    // Get weather from Open-Meteo
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current_weather=true&timezone=auto');
+    const d=await r.json();
+    if(d.current_weather){applyWeather(d.current_weather.weathercode,d.current_weather.temperature,city)}
+  }catch(e){applyWeather(0,null,'')}
+}
 detectWeather();
 function handleReveal(){document.querySelectorAll('.reveal').forEach(el=>{const rect=el.getBoundingClientRect();if(rect.top<window.innerHeight*0.85)el.classList.add('visible')})}
 window.addEventListener('scroll',handleReveal);
