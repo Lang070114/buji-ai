@@ -225,6 +225,23 @@ body.night-bg .concept-callout h4{color:rgba(230,225,245,0.88)!important}
 body.night-bg .concept-callout p{color:rgba(205,200,220,0.65)!important}
 body.night-bg .concept-callout .concept-why{color:#8EC8B0!important;background:rgba(110,200,170,0.05)!important}
 body.night-bg .scenario-tab-content .industry-card{background:rgba(26,24,38,0.58)!important;border-color:rgba(255,255,255,0.04)!important}
+
+/* ===== Music Player ===== */
+#musicPlayer{position:fixed;bottom:20px;right:20px;z-index:150;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.78);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.9);border-radius:50px;padding:8px 16px 8px 14px;box-shadow:0 4px 20px rgba(44,40,50,0.08);cursor:pointer;transition:all 0.35s ease;font-family:var(--font-main)}
+#musicPlayer:hover{box-shadow:0 6px 28px rgba(44,40,50,0.12);transform:translateY(-1px)}
+#musicPlayer.playing{background:rgba(142,197,180,0.15);border-color:rgba(142,197,180,0.3)}
+#musicPlayer .music-icon{font-size:1.2rem;animation:none}
+#musicPlayer.playing .music-icon{animation:musicPulse 1.5s ease-in-out infinite}
+@keyframes musicPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+#musicPlayer .music-label{font-size:0.78rem;color:var(--text-mid);font-weight:550;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#musicPlayer .music-toggle{width:30px;height:30px;border-radius:50%;border:none;background:rgba(0,0,0,0.04);cursor:pointer;font-size:0.95rem;display:flex;align-items:center;justify-content:center;transition:all 0.25s;flex-shrink:0}
+#musicPlayer .music-toggle:hover{background:rgba(0,0,0,0.08)}
+body.night-bg #musicPlayer{background:rgba(26,24,38,0.72);border-color:rgba(255,255,255,0.06)}
+body.night-bg #musicPlayer .music-label{color:rgba(255,255,255,0.55)}
+body.night-bg #musicPlayer.playing{background:rgba(142,197,180,0.1);border-color:rgba(142,197,180,0.2)}
+body.night-bg #musicPlayer .music-toggle{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.65)}
+@media(max-width:768px){#musicPlayer{bottom:14px;right:14px;padding:6px 12px 6px 10px;gap:6px}#musicPlayer .music-label{max-width:80px;font-size:0.72rem}}
+
 @media(max-width:768px){.nav{padding:8px 18px;gap:14px;border-radius:40px}.nav-links{gap:10px}.nav-links a{font-size:0.8rem}.hero-compact{padding:110px 0 50px}section{padding:60px 0}.section-title{font-size:1.6rem}.scenarios-grid{grid-template-columns:1fr}.cc-section{padding:40px 24px}.quiz-wrapper{padding:32px 22px}.timeline{padding-left:28px}.timeline::before{left:12px}.timeline-dot{left:-22px;width:12px;height:12px}.tutorial-body{flex-direction:column}.tutorial-side{width:100%;border-left:none;border-top:1px solid rgba(0,0,0,0.05)}.tutorial-panel{max-height:96vh}}@media(max-width:480px){.container{padding:0 16px}.btn{padding:12px 24px;font-size:0.9rem}.quiz-question{font-size:1.1rem}}
 </style>
 </head>
@@ -647,9 +664,76 @@ async function detectWeather(){
   }catch(e){applyWeather(0,null,'')}
 }
 detectWeather();
+
+// ===== MUSIC PLAYER =====
+const MUSIC_SRC='https://music.163.com/outchain/player?type=2&id=2026783884&auto=1&height=0';
+let musicPlaying=false,musicLoaded=false,loopTimer=null;
+const LOOP_INTERVAL=210000; // ~3.5min single-song loop
+function loadMusic(){
+  const frame=document.getElementById('musicFrame');
+  if(frame&&!musicLoaded){
+    frame.src=MUSIC_SRC;
+    musicLoaded=true;
+    musicPlaying=true;
+    updateMusicUI();
+    startLoop();
+  }
+}
+function startLoop(){stopLoop();loopTimer=setInterval(()=>{const frame=document.getElementById('musicFrame');if(frame&&musicPlaying){frame.src='about:blank';setTimeout(()=>{frame.src=MUSIC_SRC},300)}},LOOP_INTERVAL)}
+function stopLoop(){if(loopTimer){clearInterval(loopTimer);loopTimer=null}}
+function toggleMusic(){
+  const player=document.getElementById('musicPlayer');
+  if(!musicLoaded){loadMusic();return}
+  const frame=document.getElementById('musicFrame');
+  if(musicPlaying){
+    frame.src='about:blank';
+    musicPlaying=false;
+    stopLoop();
+  }else{
+    frame.src=MUSIC_SRC;
+    musicPlaying=true;
+    startLoop();
+  }
+  updateMusicUI();
+}
+function updateMusicUI(){
+  const player=document.getElementById('musicPlayer');
+  const toggle=document.getElementById('musicToggle');
+  if(musicPlaying){
+    player.classList.add('playing');
+    toggle.textContent='⏸️';
+  }else{
+    player.classList.remove('playing');
+    toggle.textContent='▶️';
+  }
+}
+// Auto-load after page interaction (modern browsers require user gesture for autoplay)
+let musicStarted=false;
+function tryAutoStart(){
+  if(musicStarted)return;
+  musicStarted=true;
+  loadMusic();
+  document.removeEventListener('click',tryAutoStart);
+  document.removeEventListener('scroll',tryAutoStart);
+  document.removeEventListener('keydown',tryAutoStart);
+}
+document.addEventListener('click',tryAutoStart,{once:true});
+document.addEventListener('scroll',tryAutoStart,{once:true});
+document.addEventListener('keydown',tryAutoStart,{once:true});
+// Also try after 2s delay (if browser allows non-gesture autoplay)
+setTimeout(()=>{if(!musicStarted){tryAutoStart()}},2000);
 function handleReveal(){document.querySelectorAll('.reveal').forEach(el=>{const rect=el.getBoundingClientRect();if(rect.top<window.innerHeight*0.85)el.classList.add('visible')})}
 window.addEventListener('scroll',handleReveal);
 window.addEventListener('load',()=>{handleReveal();renderQuestion(0);buildProgress()});
 </script>
+
+<!-- Music Player -->
+<div id="musicPlayer" title="Jazzzcz - 从风中寄回的信">
+  <span class="music-icon" id="musicIcon">🎵</span>
+  <span class="music-label">从风中寄回的信</span>
+  <button class="music-toggle" id="musicToggle" onclick="toggleMusic()">⏯️</button>
+</div>
+<iframe id="musicFrame" src="about:blank" allow="autoplay" style="position:fixed;top:-100px;left:-100px;width:1px;height:1px;border:none;pointer-events:none;z-index:-1"></iframe>
+
 </body>
 </html>
