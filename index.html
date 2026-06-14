@@ -943,21 +943,12 @@ function updateMusicUI(){
     toggle.textContent='▶️';
   }
 }
-// Auto-load after page interaction (modern browsers require user gesture for autoplay)
-let musicStarted=false;
-function tryAutoStart(){
-  if(musicStarted)return;
-  musicStarted=true;
-  loadMusic();
-  document.removeEventListener('click',tryAutoStart);
-  document.removeEventListener('scroll',tryAutoStart);
-  document.removeEventListener('keydown',tryAutoStart);
-}
-document.addEventListener('click',tryAutoStart,{once:true});
-document.addEventListener('scroll',tryAutoStart,{once:true});
-document.addEventListener('keydown',tryAutoStart,{once:true});
-// Also try after 2s delay (if browser allows non-gesture autoplay)
-setTimeout(()=>{if(!musicStarted){tryAutoStart()}},2000);
+	// Auto-play on page load (direct iframe load)
+	window.addEventListener('load',()=>{
+	  setTimeout(()=>{loadMusic()},500);
+	});
+	let musicStarted=false;
+	document.addEventListener('click',()=>{if(!musicStarted){musicStarted=true;loadMusic()}},{once:true});
 function handleReveal(){document.querySelectorAll('.reveal').forEach(el=>{const rect=el.getBoundingClientRect();if(rect.top<window.innerHeight*0.85)el.classList.add('visible')})}
 window.addEventListener('scroll',handleReveal);
 window.addEventListener('load',()=>{handleReveal();allNewsItems=[...curatedNews];renderNewsCards(allNewsItems);updateTabCounts();document.getElementById('newsUpdatedText').textContent='已加载精选资讯库';setTimeout(()=>refreshNews(),1200)});
