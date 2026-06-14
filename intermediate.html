@@ -760,36 +760,35 @@ async function detectWeather(){
 detectWeather();
 
 // ===== MUSIC PLAYER =====
-const MUSIC_SRC='https://music.163.com/outchain/player?type=2&id=2026783884&auto=1&height=0';
-let musicPlaying=false,musicLoaded=false,loopTimer=null;
-const LOOP_INTERVAL=210000; // ~3.5min single-song loop
+const MUSIC_SRC='https://music.163.com/song/media/outer/url?id=2026783884.mp3';
+let musicPlaying=false
 function loadMusic(){
-  const frame=document.getElementById('musicFrame');
-  if(frame&&!musicLoaded){
-    frame.src=MUSIC_SRC;
-    musicLoaded=true;
-    musicPlaying=true;
-    updateMusicUI();
-    startLoop();
+  const audio=document.getElementById('bgMusic');
+  if(!audio)return;
+  const savedTime=sessionStorage.getItem('bujiMusicTime');
+  const wasPlaying=sessionStorage.getItem('bujiMusicPlaying');
+  if(savedTime&&wasPlaying==='true'){
+    audio.currentTime=parseFloat(savedTime);
+    audio.play().then(()=>{musicPlaying=true;updateMusicUI()}).catch(()=>{});
+  }else{
+    audio.play().then(()=>{musicPlaying=true;updateMusicUI()}).catch(()=>{});
   }
 }
-function startLoop(){stopLoop();loopTimer=setInterval(()=>{const frame=document.getElementById('musicFrame');if(frame&&musicPlaying){frame.src='about:blank';setTimeout(()=>{frame.src=MUSIC_SRC},300)}},LOOP_INTERVAL)}
-function stopLoop(){if(loopTimer){clearInterval(loopTimer);loopTimer=null}}
 function toggleMusic(){
-  const player=document.getElementById('musicPlayer');
-  if(!musicLoaded){loadMusic();return}
-  const frame=document.getElementById('musicFrame');
-  if(musicPlaying){
-    frame.src='about:blank';
-    musicPlaying=false;
-    stopLoop();
-  }else{
-    frame.src=MUSIC_SRC;
-    musicPlaying=true;
-    startLoop();
-  }
+  const audio=document.getElementById('bgMusic');
+  if(!audio)return;
+  if(musicPlaying){audio.pause();musicPlaying=false}
+  else{audio.play().then(()=>{musicPlaying=true;updateMusicUI()}).catch(()=>{})}
   updateMusicUI();
 }
+// Persist playback state across page navigation
+window.addEventListener('beforeunload',()=>{
+  const audio=document.getElementById('bgMusic');
+  if(audio){
+    sessionStorage.setItem('bujiMusicTime',audio.currentTime);
+    sessionStorage.setItem('bujiMusicPlaying',musicPlaying?'true':'false');
+  }
+});
 function updateMusicUI(){
   const player=document.getElementById('musicPlayer');
   const toggle=document.getElementById('musicToggle');
@@ -818,7 +817,7 @@ window.addEventListener('load',()=>handleReveal());
   <span class="music-label">从风中寄回的信</span>
   <button class="music-toggle" id="musicToggle" onclick="toggleMusic()">⏯️</button>
 </div>
-<iframe id="musicFrame" src="about:blank" allow="autoplay" style="position:fixed;top:-100px;left:-100px;width:1px;height:1px;border:none;pointer-events:none;z-index:-1"></iframe>
+<audio id="bgMusic" src="https://music.163.com/song/media/outer/url?id=2026783884.mp3" loop preload="auto" style="display:none"></audio>
 
 </body>
 </html>
