@@ -278,6 +278,7 @@ body.night-bg #musicPlayer .music-toggle{background:rgba(255,255,255,0.06);color
   <span class="weather-badge" id="weatherBadge" title="基于你的位置"><span class="w-icon">🌤️</span> <span id="weatherLabel">检测中...</span></span>
 </nav>
 
+<div id="pageRoot">
 <section class="hero-compact"><div class="container">
   <div class="path-badge"><span class="badge-icon">🌱</span> 第一站 · 我刚接触AI</div>
   <h1 style="font-size:2.2rem;font-weight:800;margin-bottom:10px">不着急，<span style="background:linear-gradient(135deg,var(--tech-purple),var(--tech-blue),var(--deep-green));-webkit-background-clip:text;-webkit-text-fill-color:transparent">慢慢来</span></h1>
@@ -840,10 +841,109 @@ function updateMusicUI(){
 	});
 	let musicStarted=false;
 	document.addEventListener('click',()=>{if(!musicStarted){musicStarted=true;loadMusic()}},{once:true});
+
+// ===== SPA NAVIGATION: seamless page switching, audio never stops =====
+(function(){
+  const CACHE={};
+  const PAGE_ROOT=document.getElementById('pageRoot');
+  if(!PAGE_ROOT)return;
+
+  async function loadPage(url){
+    // Show brief loading state
+    PAGE_ROOT.style.opacity='0';
+    PAGE_ROOT.style.transition='opacity 0.25s ease';
+
+    let html=CACHE[url];
+    if(!html){
+      const r=await fetch(url);
+      html=await r.text();
+      CACHE[url]=html;
+    }
+
+    // Extract pageRoot content from fetched HTML
+    const match=html.match(/<div id="pageRoot"[^>]*>([\s\S]*)<\/div>\s*(?:<!-- Music|<!-- Audio|<audio|<div id="musicPlayer")/);
+    if(!match){
+      // Fallback: try regex without music context
+      const m2=html.match(/<div id="pageRoot"[^>]*>([\s\S]*)<\/div>/);
+      if(m2){PAGE_ROOT.innerHTML=m2[1]}
+      else{window.location.href=url;return}
+    }else{
+      PAGE_ROOT.innerHTML=match[1];
+    }
+
+    // Fade back in
+    setTimeout(()=>{PAGE_ROOT.style.opacity='1'},100);
+
+    // Update history
+    if(window.location.href!==new URL(url,window.location.origin).href){
+      history.pushState({url},'',url);
+    }
+
+    // Scroll to top
+    window.scrollTo({top:0,behavior:'instant'});
+
+    // Re-initialize page-specific JS
+    reinitPage(url);
+
+    // Update active nav link
+    document.querySelectorAll('.nav-links a').forEach(a=>{
+      a.classList.remove('active');
+      if(a.getAttribute('href')===url.split('/').pop()||a.getAttribute('href')===url){
+        a.classList.add('active');
+      }
+    });
+  }
+
+  function reinitPage(url){
+    const page=url.split('/').pop().replace('.html','')||'index';
+    // Call page-specific init functions
+    if(typeof renderQuestion==='function'&&page==='beginner'){renderQuestion(0);buildProgress()}
+    if(typeof handleReveal==='function'){handleReveal()}
+    // Rebuild parallax shapes if needed
+    if(typeof buildParallaxShapes==='function'){buildParallaxShapes()}
+    // Filter news if on index page
+    if(page==='index'&&typeof filterNews==='function'){filterNews(currentNewsFilter||'all',document.querySelector('.news-tab.active'))}
+  }
+
+  // Intercept all internal navigation clicks
+  document.addEventListener('click',function(e){
+    const link=e.target.closest('a');
+    if(!link)return;
+    const href=link.getAttribute('href');
+    if(!href)return;
+    // Only intercept .html pages on the same origin
+    if(href.match(/^[a-z]+\.html$/)||href==='index.html'||href==='./'||href==='/'){
+      e.preventDefault();
+      const target=href==='./'||href==='/'?'index.html':href;
+      loadPage(target);
+    }
+    // Also intercept #hash links with page prefix
+    if(href.match(/^[a-z]+\.html#/)){
+      e.preventDefault();
+      const [page,hash]=href.split('#');
+      loadPage(page).then(()=>{
+        setTimeout(()=>{const el=document.querySelector('#'+hash);if(el)el.scrollIntoView({behavior:'smooth'})},300);
+      });
+    }
+  });
+
+  // Handle back/forward browser buttons
+  window.addEventListener('popstate',function(e){
+    if(e.state&&e.state.url){
+      loadPage(e.state.url);
+    }
+  });
+
+  // Initialize current page in history
+  if(!history.state||!history.state.url){
+    history.replaceState({url:window.location.href},'',window.location.href);
+  }
+})();
 function handleReveal(){document.querySelectorAll('.reveal').forEach(el=>{const rect=el.getBoundingClientRect();if(rect.top<window.innerHeight*0.85)el.classList.add('visible')})}
 window.addEventListener('scroll',handleReveal);
 window.addEventListener('load',()=>{handleReveal();renderQuestion(0);buildProgress()});
 </script>
+</div>
 
 <!-- Music Player -->
 <div id="musicPlayer" title="Jazzzcz - 从风中寄回的信">
